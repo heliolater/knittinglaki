@@ -55,6 +55,23 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   drift_dev: ^2.34.6
   build_runner: ^2.16.1
+  flutter_launcher_icons: ^0.14.4
+
+# App icons: `dart run flutter_launcher_icons` regenerates web/android/ios icons
+# from assets/logo/. Sources are derived from assets/logo/kakerlake_original_eingebettet.svg.
+flutter_launcher_icons:
+  image_path: "assets/logo/icon-1024.png"
+  android: true
+  adaptive_icon_background: "#B5EACC"
+  adaptive_icon_foreground: "assets/logo/icon-foreground-1024.png"
+  min_sdk_android: 21
+  ios: true
+  remove_alpha_ios: true
+  web:
+    generate: true
+    image_path: "assets/logo/icon-1024.png"
+    background_color: "#B5EACC"
+    theme_color: "#A8324E"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

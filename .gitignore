@@ -33,6 +33,10 @@ migrate_working_dir/
 /build/
 /coverage/
 
+# Node (only used ad hoc for icon asset processing)
+/node_modules/
+/package-lock.json
+
 # Symbolication related
 app.*.symbols
 

@@ -3,7 +3,7 @@
     "short_name": "Knittinglaki",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#FFF8F7",
+    "background_color": "#B5EACC",
     "theme_color": "#A8324E",
     "description": "Rundenzähler fürs Stricken und Häkeln",
     "orientation": "portrait-primary",
