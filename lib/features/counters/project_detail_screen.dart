@@ -66,6 +66,7 @@ class _ProjectDetailScreenState extends ConsumerState<ProjectDetailScreen> {
           if (counters.isEmpty) return const _EmptyCounters();
           return ReorderableListView.builder(
             padding: const EdgeInsets.only(top: 4, bottom: 96),
+            buildDefaultDragHandles: false,
             itemCount: counters.length,
             onReorderItem: (oldIndex, newIndex) {
               final ids = counters.map((c) => c.id).toList();

@@ -34,6 +34,7 @@ class ProjectListScreen extends ConsumerWidget {
                 if (projects.isEmpty) return const _EmptyProjects();
                 return ReorderableListView.builder(
                   padding: const EdgeInsets.only(top: 4, bottom: 96),
+                  buildDefaultDragHandles: false,
                   itemCount: projects.length,
                   onReorderItem: (oldIndex, newIndex) {
                     final ids = projects.map((p) => p.id).toList();
