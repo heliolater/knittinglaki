@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/name_dialog.dart';
 import '../../../data/database.dart';
 import '../../../providers.dart';
 
@@ -14,6 +13,8 @@ class CounterTile extends ConsumerWidget {
   });
 
   final Counter counter;
+
+  /// Position in the list (0-based). Also drives the drag listener.
   final int dragIndex;
 
   @override
@@ -28,13 +29,13 @@ class CounterTile extends ConsumerWidget {
           children: [
             Row(
               children: [
-                Expanded(
-                  child: Text(
-                    counter.name,
-                    style: theme.textTheme.titleMedium,
-                    overflow: TextOverflow.ellipsis,
+                Text(
+                  'Zähler ${dragIndex + 1}',
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: theme.colorScheme.outline,
                   ),
                 ),
+                const Spacer(),
                 IconButton(
                   tooltip: 'Zurück auf 0',
                   icon: const Icon(Icons.restart_alt),
@@ -43,16 +44,10 @@ class CounterTile extends ConsumerWidget {
                     repo.reset(counter.id);
                   },
                 ),
-                PopupMenuButton<String>(
-                  onSelected: (value) => switch (value) {
-                    'rename' => _rename(context, ref),
-                    'delete' => _delete(context, ref),
-                    _ => null,
-                  },
-                  itemBuilder: (context) => const [
-                    PopupMenuItem(value: 'rename', child: Text('Umbenennen')),
-                    PopupMenuItem(value: 'delete', child: Text('Löschen')),
-                  ],
+                IconButton(
+                  tooltip: 'Zähler löschen',
+                  icon: const Icon(Icons.delete_outline),
+                  onPressed: () => _delete(context, ref),
                 ),
                 ReorderableDragStartListener(
                   index: dragIndex,
@@ -103,22 +98,11 @@ class CounterTile extends ConsumerWidget {
     );
   }
 
-  Future<void> _rename(BuildContext context, WidgetRef ref) async {
-    final name = await showNameDialog(
-      context,
-      title: 'Zähler umbenennen',
-      initialValue: counter.name,
-    );
-    if (name != null) {
-      await ref.read(projectRepositoryProvider).renameCounter(counter.id, name);
-    }
-  }
-
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('„${counter.name}" löschen?'),
+        title: Text('Zähler ${dragIndex + 1} löschen?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),

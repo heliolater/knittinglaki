@@ -21,6 +21,9 @@ class _SpyRepository extends ProjectRepository {
 
   @override
   Future<void> reset(int counterId) async => calls.add('reset');
+
+  @override
+  Future<void> deleteCounter(int counterId) async => calls.add('delete');
 }
 
 void main() {
@@ -33,7 +36,6 @@ void main() {
     final counter = Counter(
       id: 1,
       projectId: 1,
-      name: 'Bund',
       value: 7,
       sortOrder: 0,
       createdAt: DateTime(2024),
@@ -50,7 +52,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Bund'), findsOneWidget);
+    expect(find.text('Zähler 1'), findsOneWidget);
     expect(find.text('7'), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.add));

@@ -87,17 +87,7 @@ class _ProjectDetailScreenState extends ConsumerState<ProjectDetailScreen> {
   }
 
   Future<void> _addCounter() async {
-    final name = await showNameDialog(
-      context,
-      title: 'Neuer Zähler',
-      hintText: 'z. B. Bund',
-      confirmLabel: 'Anlegen',
-    );
-    if (name != null) {
-      await ref
-          .read(projectRepositoryProvider)
-          .createCounter(widget.projectId, name);
-    }
+    await ref.read(projectRepositoryProvider).createCounter(widget.projectId);
   }
 
   Future<void> _renameProject(String currentName) async {

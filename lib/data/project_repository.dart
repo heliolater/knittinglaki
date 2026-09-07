@@ -41,10 +41,18 @@ class ProjectRepository {
         );
   }
 
+  /// Creates a project and gives it its first counter straight away, so it is
+  /// never opened empty.
   Future<int> createProject(String name) {
-    return _db.into(_db.projects).insert(
-          ProjectsCompanion.insert(name: name.trim()),
-        );
+    return _db.transaction(() async {
+      final id = await _db.into(_db.projects).insert(
+            ProjectsCompanion.insert(name: name.trim()),
+          );
+      await _db.into(_db.counters).insert(
+            CountersCompanion.insert(projectId: id),
+          );
+      return id;
+    });
   }
 
   Future<void> renameProject(int projectId, String name) {
@@ -83,15 +91,10 @@ class ProjectRepository {
         .watch();
   }
 
-  Future<int> createCounter(int projectId, String name) {
+  Future<int> createCounter(int projectId) {
     return _db.into(_db.counters).insert(
-          CountersCompanion.insert(projectId: projectId, name: name.trim()),
+          CountersCompanion.insert(projectId: projectId),
         );
-  }
-
-  Future<void> renameCounter(int counterId, String name) {
-    return (_db.update(_db.counters)..where((c) => c.id.equals(counterId)))
-        .write(CountersCompanion(name: Value(name.trim())));
   }
 
   Future<void> deleteCounter(int counterId) {

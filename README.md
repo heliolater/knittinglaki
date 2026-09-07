@@ -2,9 +2,10 @@
 
 Rundenzähler fürs Stricken und Häkeln.
 
-Lege Projekte an (Socken, Schal, …), gib jedem Projekt beliebig viele Zähler
-und zähle Runden mit `+` / `−` / `Reset`. Alles wird **lokal** und persistent
-gespeichert – kein Account, kein Server.
+Lege Projekte an (Socken, Schal, …) und zähle Runden mit `+` / `−` / `Reset`.
+Jedes Projekt startet mit einem Zähler; weitere lassen sich beliebig ergänzen.
+Zähler haben keinen Titel – sie werden über ihre Position unterschieden. Alles
+wird **lokal** und persistent gespeichert – kein Account, kein Server.
 
 ## Stack
 

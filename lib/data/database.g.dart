@@ -334,19 +334,6 @@ class $CountersTable extends Counters with TableInfo<$CountersTable, Counter> {
       'REFERENCES projects (id) ON DELETE CASCADE',
     ),
   );
-  static const VerificationMeta _nameMeta = const VerificationMeta('name');
-  @override
-  late final GeneratedColumn<String> name = GeneratedColumn<String>(
-    'name',
-    aliasedName,
-    false,
-    additionalChecks: GeneratedColumn.checkTextLength(
-      minTextLength: 1,
-      maxTextLength: 100,
-    ),
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
   static const VerificationMeta _valueMeta = const VerificationMeta('value');
   @override
   late final GeneratedColumn<int> value = GeneratedColumn<int>(
@@ -385,7 +372,6 @@ class $CountersTable extends Counters with TableInfo<$CountersTable, Counter> {
   List<GeneratedColumn> get $columns => [
     id,
     projectId,
-    name,
     value,
     sortOrder,
     createdAt,
@@ -412,14 +398,6 @@ class $CountersTable extends Counters with TableInfo<$CountersTable, Counter> {
       );
     } else if (isInserting) {
       context.missing(_projectIdMeta);
-    }
-    if (data.containsKey('name')) {
-      context.handle(
-        _nameMeta,
-        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_nameMeta);
     }
     if (data.containsKey('value')) {
       context.handle(
@@ -456,10 +434,6 @@ class $CountersTable extends Counters with TableInfo<$CountersTable, Counter> {
         DriftSqlType.int,
         data['${effectivePrefix}project_id'],
       )!,
-      name: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}name'],
-      )!,
       value: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}value'],
@@ -484,7 +458,6 @@ class $CountersTable extends Counters with TableInfo<$CountersTable, Counter> {
 class Counter extends DataClass implements Insertable<Counter> {
   final int id;
   final int projectId;
-  final String name;
 
   /// Current round. Never negative – decrement clamps at 0.
   final int value;
@@ -495,7 +468,6 @@ class Counter extends DataClass implements Insertable<Counter> {
   const Counter({
     required this.id,
     required this.projectId,
-    required this.name,
     required this.value,
     required this.sortOrder,
     required this.createdAt,
@@ -505,7 +477,6 @@ class Counter extends DataClass implements Insertable<Counter> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['project_id'] = Variable<int>(projectId);
-    map['name'] = Variable<String>(name);
     map['value'] = Variable<int>(value);
     map['sort_order'] = Variable<int>(sortOrder);
     map['created_at'] = Variable<DateTime>(createdAt);
@@ -516,7 +487,6 @@ class Counter extends DataClass implements Insertable<Counter> {
     return CountersCompanion(
       id: Value(id),
       projectId: Value(projectId),
-      name: Value(name),
       value: Value(value),
       sortOrder: Value(sortOrder),
       createdAt: Value(createdAt),
@@ -531,7 +501,6 @@ class Counter extends DataClass implements Insertable<Counter> {
     return Counter(
       id: serializer.fromJson<int>(json['id']),
       projectId: serializer.fromJson<int>(json['projectId']),
-      name: serializer.fromJson<String>(json['name']),
       value: serializer.fromJson<int>(json['value']),
       sortOrder: serializer.fromJson<int>(json['sortOrder']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -543,7 +512,6 @@ class Counter extends DataClass implements Insertable<Counter> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'projectId': serializer.toJson<int>(projectId),
-      'name': serializer.toJson<String>(name),
       'value': serializer.toJson<int>(value),
       'sortOrder': serializer.toJson<int>(sortOrder),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -553,14 +521,12 @@ class Counter extends DataClass implements Insertable<Counter> {
   Counter copyWith({
     int? id,
     int? projectId,
-    String? name,
     int? value,
     int? sortOrder,
     DateTime? createdAt,
   }) => Counter(
     id: id ?? this.id,
     projectId: projectId ?? this.projectId,
-    name: name ?? this.name,
     value: value ?? this.value,
     sortOrder: sortOrder ?? this.sortOrder,
     createdAt: createdAt ?? this.createdAt,
@@ -569,7 +535,6 @@ class Counter extends DataClass implements Insertable<Counter> {
     return Counter(
       id: data.id.present ? data.id.value : this.id,
       projectId: data.projectId.present ? data.projectId.value : this.projectId,
-      name: data.name.present ? data.name.value : this.name,
       value: data.value.present ? data.value.value : this.value,
       sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -581,7 +546,6 @@ class Counter extends DataClass implements Insertable<Counter> {
     return (StringBuffer('Counter(')
           ..write('id: $id, ')
           ..write('projectId: $projectId, ')
-          ..write('name: $name, ')
           ..write('value: $value, ')
           ..write('sortOrder: $sortOrder, ')
           ..write('createdAt: $createdAt')
@@ -590,15 +554,13 @@ class Counter extends DataClass implements Insertable<Counter> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, projectId, name, value, sortOrder, createdAt);
+  int get hashCode => Object.hash(id, projectId, value, sortOrder, createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Counter &&
           other.id == this.id &&
           other.projectId == this.projectId &&
-          other.name == this.name &&
           other.value == this.value &&
           other.sortOrder == this.sortOrder &&
           other.createdAt == this.createdAt);
@@ -607,14 +569,12 @@ class Counter extends DataClass implements Insertable<Counter> {
 class CountersCompanion extends UpdateCompanion<Counter> {
   final Value<int> id;
   final Value<int> projectId;
-  final Value<String> name;
   final Value<int> value;
   final Value<int> sortOrder;
   final Value<DateTime> createdAt;
   const CountersCompanion({
     this.id = const Value.absent(),
     this.projectId = const Value.absent(),
-    this.name = const Value.absent(),
     this.value = const Value.absent(),
     this.sortOrder = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -622,16 +582,13 @@ class CountersCompanion extends UpdateCompanion<Counter> {
   CountersCompanion.insert({
     this.id = const Value.absent(),
     required int projectId,
-    required String name,
     this.value = const Value.absent(),
     this.sortOrder = const Value.absent(),
     this.createdAt = const Value.absent(),
-  }) : projectId = Value(projectId),
-       name = Value(name);
+  }) : projectId = Value(projectId);
   static Insertable<Counter> custom({
     Expression<int>? id,
     Expression<int>? projectId,
-    Expression<String>? name,
     Expression<int>? value,
     Expression<int>? sortOrder,
     Expression<DateTime>? createdAt,
@@ -639,7 +596,6 @@ class CountersCompanion extends UpdateCompanion<Counter> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (projectId != null) 'project_id': projectId,
-      if (name != null) 'name': name,
       if (value != null) 'value': value,
       if (sortOrder != null) 'sort_order': sortOrder,
       if (createdAt != null) 'created_at': createdAt,
@@ -649,7 +605,6 @@ class CountersCompanion extends UpdateCompanion<Counter> {
   CountersCompanion copyWith({
     Value<int>? id,
     Value<int>? projectId,
-    Value<String>? name,
     Value<int>? value,
     Value<int>? sortOrder,
     Value<DateTime>? createdAt,
@@ -657,7 +612,6 @@ class CountersCompanion extends UpdateCompanion<Counter> {
     return CountersCompanion(
       id: id ?? this.id,
       projectId: projectId ?? this.projectId,
-      name: name ?? this.name,
       value: value ?? this.value,
       sortOrder: sortOrder ?? this.sortOrder,
       createdAt: createdAt ?? this.createdAt,
@@ -672,9 +626,6 @@ class CountersCompanion extends UpdateCompanion<Counter> {
     }
     if (projectId.present) {
       map['project_id'] = Variable<int>(projectId.value);
-    }
-    if (name.present) {
-      map['name'] = Variable<String>(name.value);
     }
     if (value.present) {
       map['value'] = Variable<int>(value.value);
@@ -693,7 +644,6 @@ class CountersCompanion extends UpdateCompanion<Counter> {
     return (StringBuffer('CountersCompanion(')
           ..write('id: $id, ')
           ..write('projectId: $projectId, ')
-          ..write('name: $name, ')
           ..write('value: $value, ')
           ..write('sortOrder: $sortOrder, ')
           ..write('createdAt: $createdAt')
@@ -994,7 +944,6 @@ typedef $$ProjectsTableProcessedTableManager =
 typedef $$CountersTableCreateCompanionBuilder = CountersCompanion Function({
   Value<int> id,
   required int projectId,
-  required String name,
   Value<int> value,
   Value<int> sortOrder,
   Value<DateTime> createdAt,
@@ -1002,7 +951,6 @@ typedef $$CountersTableCreateCompanionBuilder = CountersCompanion Function({
 typedef $$CountersTableUpdateCompanionBuilder = CountersCompanion Function({
   Value<int> id,
   Value<int> projectId,
-  Value<String> name,
   Value<int> value,
   Value<int> sortOrder,
   Value<DateTime> createdAt,
@@ -1041,11 +989,6 @@ class $$CountersTableFilterComposer
   });
   ColumnFilters<int> get id => $composableBuilder(
     column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get name => $composableBuilder(
-    column: $table.name,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1102,11 +1045,6 @@ class $$CountersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get name => $composableBuilder(
-    column: $table.name,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<int> get value => $composableBuilder(
     column: $table.value,
     builder: (column) => ColumnOrderings(column),
@@ -1157,9 +1095,6 @@ class $$CountersTableAnnotationComposer
   });
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get name =>
-      $composableBuilder(column: $table.name, builder: (column) => column);
 
   GeneratedColumn<int> get value =>
       $composableBuilder(column: $table.value, builder: (column) => column);
@@ -1224,14 +1159,12 @@ class $$CountersTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<int> projectId = const Value.absent(),
-                Value<String> name = const Value.absent(),
                 Value<int> value = const Value.absent(),
                 Value<int> sortOrder = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => CountersCompanion(
                 id: id,
                 projectId: projectId,
-                name: name,
                 value: value,
                 sortOrder: sortOrder,
                 createdAt: createdAt,
@@ -1240,14 +1173,12 @@ class $$CountersTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 required int projectId,
-                required String name,
                 Value<int> value = const Value.absent(),
                 Value<int> sortOrder = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => CountersCompanion.insert(
                 id: id,
                 projectId: projectId,
-                name: name,
                 value: value,
                 sortOrder: sortOrder,
                 createdAt: createdAt,
