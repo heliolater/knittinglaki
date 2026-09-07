@@ -13,8 +13,6 @@ void main() {
         overrides: [
           projectsProvider
               .overrideWith((ref) => Stream.value(const <Project>[])),
-          counterCountsProvider
-              .overrideWith((ref) => Stream.value(const <int, int>{})),
         ],
         child: const MaterialApp(home: ProjectListScreen()),
       ),

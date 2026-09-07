@@ -13,8 +13,6 @@ class ProjectListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final projectsAsync = ref.watch(projectsProvider);
-    final counts =
-        ref.watch(counterCountsProvider).value ?? const <int, int>{};
 
     return Scaffold(
       appBar: AppBar(title: const Text('Knittinglaki')),
@@ -49,7 +47,6 @@ class ProjectListScreen extends ConsumerWidget {
                     return _ProjectCard(
                       key: ValueKey(project.id),
                       project: project,
-                      counterCount: counts[project.id] ?? 0,
                       dragIndex: index,
                     );
                   },
@@ -79,12 +76,10 @@ class _ProjectCard extends ConsumerWidget {
   const _ProjectCard({
     super.key,
     required this.project,
-    required this.counterCount,
     required this.dragIndex,
   });
 
   final Project project;
-  final int counterCount;
   final int dragIndex;
 
   @override
@@ -95,23 +90,19 @@ class _ProjectCard extends ConsumerWidget {
           project.name,
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
-        subtitle: Text(
-          counterCount == 1 ? '1 Zähler' : '$counterCount Zähler',
-        ),
         onTap: () => context.push('/project/${project.id}'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            PopupMenuButton<String>(
-              onSelected: (value) => switch (value) {
-                'rename' => _rename(context, ref),
-                'delete' => _delete(context, ref),
-                _ => null,
-              },
-              itemBuilder: (context) => const [
-                PopupMenuItem(value: 'rename', child: Text('Umbenennen')),
-                PopupMenuItem(value: 'delete', child: Text('Löschen')),
-              ],
+            IconButton(
+              tooltip: 'Umbenennen',
+              icon: const Icon(Icons.edit_outlined),
+              onPressed: () => _rename(context, ref),
+            ),
+            IconButton(
+              tooltip: 'Projekt löschen',
+              icon: const Icon(Icons.delete_outline),
+              onPressed: () => _delete(context, ref),
             ),
             ReorderableDragStartListener(
               index: dragIndex,

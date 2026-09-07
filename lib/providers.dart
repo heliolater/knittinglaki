@@ -19,11 +19,6 @@ final projectsProvider = StreamProvider<List<Project>>((ref) {
   return ref.watch(projectRepositoryProvider).watchProjects();
 });
 
-/// Map of project id -> number of counters, for the list subtitle.
-final counterCountsProvider = StreamProvider<Map<int, int>>((ref) {
-  return ref.watch(projectRepositoryProvider).watchCounterCounts();
-});
-
 /// A single project by id (for the detail screen title).
 final projectProvider = StreamProvider.family<Project, int>((ref, projectId) {
   return ref.watch(projectRepositoryProvider).watchProject(projectId);

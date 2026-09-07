@@ -66,16 +66,6 @@ void main() {
     expect(await db.select(db.counters).get(), isEmpty);
   });
 
-  test('watchCounterCounts reports per-project totals', () async {
-    final p1 = await repo.createProject('P1');
-    final p2 = await repo.createProject('P2');
-    await repo.createCounter(p1);
-
-    final counts = await repo.watchCounterCounts().first;
-    expect(counts[p1], 2); // 1 auto + 1 added
-    expect(counts[p2], 1); // 1 auto
-  });
-
   test('reorderCounters persists the new order', () async {
     final pid = await repo.createProject('P');
     final a = (await counters(pid)).single.id;

@@ -27,20 +27,6 @@ class ProjectRepository {
         .watchSingle();
   }
 
-  /// Live count of counters per project id, for the list subtitle.
-  Stream<Map<int, int>> watchCounterCounts() {
-    final countExpr = _db.counters.id.count();
-    final query = _db.selectOnly(_db.counters)
-      ..addColumns([_db.counters.projectId, countExpr])
-      ..groupBy([_db.counters.projectId]);
-    return query.watch().map(
-          (rows) => {
-            for (final row in rows)
-              row.read(_db.counters.projectId)!: row.read(countExpr)!,
-          },
-        );
-  }
-
   /// Creates a project and gives it its first counter straight away, so it is
   /// never opened empty.
   Future<int> createProject(String name) {
