@@ -56,6 +56,7 @@ dev_dependencies:
   drift_dev: ^2.34.6
   build_runner: ^2.16.1
   flutter_launcher_icons: ^0.14.4
+  sqlite3: ^3.5.2
 
 # App icons: `dart run flutter_launcher_icons` regenerates web/android/ios icons
 # from assets/logo/. Sources are derived from assets/logo/kakerlake_original_eingebettet.svg.
