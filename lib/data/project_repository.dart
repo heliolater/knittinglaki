@@ -34,9 +34,7 @@ class ProjectRepository {
       final id = await _db.into(_db.projects).insert(
             ProjectsCompanion.insert(name: name.trim()),
           );
-      await _db.into(_db.counters).insert(
-            CountersCompanion.insert(projectId: id),
-          );
+      await _insertCounter(id);
       return id;
     });
   }
@@ -77,10 +75,28 @@ class ProjectRepository {
         .watch();
   }
 
+  /// Adds a counter named "Zähler N", where N is the counter count at
+  /// creation time (not its later position — renaming and reordering never
+  /// change it again).
   Future<int> createCounter(int projectId) {
+    return _db.transaction(() => _insertCounter(projectId));
+  }
+
+  Future<int> _insertCounter(int projectId) async {
+    final existing = await (_db.select(
+      _db.counters,
+    )..where((c) => c.projectId.equals(projectId))).get();
     return _db.into(_db.counters).insert(
-          CountersCompanion.insert(projectId: projectId),
-        );
+      CountersCompanion.insert(
+        projectId: projectId,
+        name: 'Zähler ${existing.length + 1}',
+      ),
+    );
+  }
+
+  Future<void> renameCounter(int counterId, String name) {
+    return (_db.update(_db.counters)..where((c) => c.id.equals(counterId)))
+        .write(CountersCompanion(name: Value(name.trim())));
   }
 
   Future<void> deleteCounter(int counterId) {

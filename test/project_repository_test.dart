@@ -33,7 +33,37 @@ void main() {
     final list = await counters(pid);
     expect(list, hasLength(1));
     expect(list.single.value, 0);
+    expect(list.single.name, 'Zähler 1');
   });
+
+  test('renameCounter changes the name without touching anything else',
+      () async {
+    final pid = await repo.createProject('Schal');
+    final counter = (await counters(pid)).single;
+
+    await repo.renameCounter(counter.id, '  Bund  ');
+
+    final renamed = (await counters(pid)).single;
+    expect(renamed.name, 'Bund');
+    expect(renamed.value, counter.value);
+  });
+
+  test(
+    'a new counter is named after the current count, even once others are '
+    'renamed or reordered',
+    () async {
+      final pid = await repo.createProject('Schal');
+      final first = (await counters(pid)).single; // "Zähler 1"
+      final secondId = await repo.createCounter(pid); // "Zähler 2"
+      await repo.renameCounter(first.id, 'Ferse');
+      await repo.renameCounter(secondId, 'Bund');
+
+      await repo.createCounter(pid);
+
+      final names = (await counters(pid)).map((c) => c.name).toList();
+      expect(names, ['Ferse', 'Bund', 'Zähler 3']);
+    },
+  );
 
   test('increment / decrement clamps at 0 / reset', () async {
     final pid = await repo.createProject('Schal');
@@ -60,7 +90,9 @@ void main() {
     final pid = await repo.createProject('Mütze');
     await repo.createCounter(pid);
     await repo.createCounter(pid);
-    expect(await counters(pid), hasLength(3)); // 1 auto + 2 added
+    final list = await counters(pid);
+    expect(list, hasLength(3)); // 1 auto + 2 added
+    expect(list.map((c) => c.name), ['Zähler 1', 'Zähler 2', 'Zähler 3']);
 
     await repo.deleteProject(pid);
     expect(await db.select(db.counters).get(), isEmpty);

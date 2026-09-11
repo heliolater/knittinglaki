@@ -26,6 +26,12 @@ class _SpyRepository extends ProjectRepository {
 
   @override
   Future<void> deleteCounter(int counterId) async => calls.add('delete');
+
+  final List<String> renamedTo = [];
+
+  @override
+  Future<void> renameCounter(int counterId, String name) async =>
+      renamedTo.add(name);
 }
 
 void main() {
@@ -57,6 +63,7 @@ void main() {
     final counter = Counter(
       id: 1,
       projectId: 1,
+      name: 'Zähler 1',
       value: 7,
       sortOrder: 0,
       createdAt: DateTime(2024),
@@ -82,6 +89,35 @@ void main() {
     expect(repo.calls, ['increment', 'decrement', 'reset', 'delete']);
   });
 
+  testWidgets('rename dialog is pre-filled and saves the new name',
+      (tester) async {
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(db.close);
+    final repo = _SpyRepository(db);
+
+    final counter = Counter(
+      id: 3,
+      projectId: 1,
+      name: 'Zähler 2',
+      value: 0,
+      sortOrder: 1,
+      createdAt: DateTime(2024),
+    );
+
+    await pumpCard(tester, repo, counter, CounterCardVariant.circle);
+
+    await tester.tap(find.byIcon(Icons.edit_outlined));
+    await tester.pumpAndSettle();
+
+    expect(find.widgetWithText(TextField, 'Zähler 2'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextField), 'Ferse');
+    await tester.tap(find.text('Speichern'));
+    await tester.pumpAndSettle();
+
+    expect(repo.renamedTo, ['Ferse']);
+  });
+
   testWidgets('renders the columnBig layout without overflow', (tester) async {
     final db = AppDatabase.forTesting(NativeDatabase.memory());
     addTearDown(db.close);
@@ -90,6 +126,7 @@ void main() {
     final counter = Counter(
       id: 2,
       projectId: 1,
+      name: 'Zähler 1',
       value: 128,
       sortOrder: 0,
       createdAt: DateTime(2024),

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/app_colors.dart';
+import '../../../core/name_dialog.dart';
 import '../../../core/plus_button.dart';
 import '../../../core/round_icon_button.dart';
 import '../../../data/database.dart';
@@ -19,8 +20,7 @@ class CounterCard extends ConsumerWidget {
 
   final Counter counter;
 
-  /// Position in the list (0-based) — also the counter's display number and
-  /// the drag listener's index. Counters have no editable title.
+  /// Position in the list (0-based) — drives the drag listener's index.
   final int dragIndex;
   final CounterCardVariant variant;
 
@@ -89,10 +89,16 @@ class CounterCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _Header(dragIndex: dragIndex, onReset: () {
-            HapticFeedback.mediumImpact();
-            repo.reset(counter.id);
-          }, onDelete: () => _delete(context, ref)),
+          _Header(
+            name: counter.name,
+            dragIndex: dragIndex,
+            onRename: () => _rename(context, ref),
+            onReset: () {
+              HapticFeedback.mediumImpact();
+              repo.reset(counter.id);
+            },
+            onDelete: () => _delete(context, ref),
+          ),
           const SizedBox(height: 10),
           if (variant.layout == CounterCardLayout.row)
             Row(
@@ -130,11 +136,22 @@ class CounterCard extends ConsumerWidget {
     );
   }
 
+  Future<void> _rename(BuildContext context, WidgetRef ref) async {
+    final name = await showNameDialog(
+      context,
+      title: 'Zähler umbenennen',
+      initialValue: counter.name,
+    );
+    if (name != null) {
+      await ref.read(projectRepositoryProvider).renameCounter(counter.id, name);
+    }
+  }
+
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Zähler ${dragIndex + 1} löschen?'),
+        title: Text('„${counter.name}" löschen?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -155,12 +172,16 @@ class CounterCard extends ConsumerWidget {
 
 class _Header extends StatelessWidget {
   const _Header({
+    required this.name,
     required this.dragIndex,
+    required this.onRename,
     required this.onReset,
     required this.onDelete,
   });
 
+  final String name;
   final int dragIndex;
+  final VoidCallback onRename;
   final VoidCallback onReset;
   final VoidCallback onDelete;
 
@@ -169,33 +190,46 @@ class _Header extends StatelessWidget {
     final colors = context.colors;
     return Row(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 9,
-                height: 9,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: colors.mintDeep,
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 9,
+                  height: 9,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: colors.mintDeep,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'ZÄHLER ${dragIndex + 1}',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 11 * 0.11,
-                  color: colors.muted,
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    name.toUpperCase(),
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 11 * 0.11,
+                      color: colors.muted,
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-        const Spacer(),
+        RoundIconButton(
+          icon: Icons.edit_outlined,
+          diameter: 42,
+          iconSize: 20,
+          color: colors.muted,
+          hoverColor: colors.hover,
+          semanticLabel: 'Umbenennen',
+          onPressed: onRename,
+        ),
         RoundIconButton(
           icon: Icons.refresh_rounded,
           diameter: 42,
