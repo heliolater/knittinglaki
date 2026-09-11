@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'core/error_banner.dart';
 import 'core/theme.dart';
 import 'features/counters/project_detail_screen.dart';
 import 'features/projects/project_list_screen.dart';
@@ -33,6 +34,7 @@ class KnittinglakiApp extends StatelessWidget {
       theme: buildTheme(Brightness.light),
       darkTheme: buildTheme(Brightness.dark),
       routerConfig: _router,
+      builder: (context, child) => Stack(children: [?child, const ErrorBanner()]),
     );
   }
 }
