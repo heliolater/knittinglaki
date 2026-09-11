@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'core/error_banner.dart';
 import 'core/theme.dart';
+import 'core/theme_mode_controller.dart';
 import 'features/counters/project_detail_screen.dart';
 import 'features/projects/project_list_screen.dart';
 
@@ -23,16 +25,19 @@ final _router = GoRouter(
   ],
 );
 
-class KnittinglakiApp extends StatelessWidget {
+class KnittinglakiApp extends ConsumerWidget {
   const KnittinglakiApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider).value ?? ThemeMode.system;
+
     return MaterialApp.router(
       title: 'Knittinglaki',
       debugShowCheckedModeBanner: false,
       theme: buildTheme(Brightness.light),
       darkTheme: buildTheme(Brightness.dark),
+      themeMode: themeMode,
       routerConfig: _router,
       builder: (context, child) => Stack(children: [?child, const ErrorBanner()]),
     );

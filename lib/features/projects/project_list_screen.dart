@@ -7,6 +7,7 @@ import '../../core/name_dialog.dart';
 import '../../core/pill_fab.dart';
 import '../../providers.dart';
 import 'widgets/project_card.dart';
+import 'widgets/theme_toggle_button.dart';
 import 'widgets/wordmark.dart';
 
 class ProjectListScreen extends ConsumerWidget {
@@ -22,8 +23,14 @@ class ProjectListScreen extends ConsumerWidget {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(64),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Align(alignment: Alignment.centerLeft, child: Wordmark()),
+          padding: const EdgeInsets.only(left: 24, right: 12),
+          child: Row(
+            children: const [
+              Wordmark(),
+              Spacer(),
+              ThemeToggleButton(),
+            ],
+          ),
         ),
       ),
       body: Stack(
