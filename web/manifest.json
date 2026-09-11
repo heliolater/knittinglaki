@@ -4,7 +4,7 @@
     "start_url": ".",
     "display": "standalone",
     "background_color": "#B5EACC",
-    "theme_color": "#A8324E",
+    "theme_color": "#4A2C1B",
     "description": "Rundenzähler fürs Stricken und Häkeln",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,

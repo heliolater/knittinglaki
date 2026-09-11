@@ -18,6 +18,7 @@ wird **lokal** und persistent gespeichert – kein Account, kein Server.
 | Bildschirm wach | `wakelock_plus` |
 | Auslieferung v1 | Web-App / PWA, gehostet auf Cloudflare Pages |
 | App-/Bundle-ID | `com.kaltenbeck.knittinglaki` |
+| Design | Claude-Design-Projekt „Knittinglaki Zähler-UI" (Turn 1 verbindlich) – Tokens in `lib/core/app_colors.dart`, Schrift DM Sans (`assets/fonts/`) |
 
 Native Android/iOS-Builds sind aus derselben Codebasis möglich; das
 Home-Screen-Widget kommt mit der nativen Android-Phase.
